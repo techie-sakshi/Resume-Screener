@@ -174,6 +174,30 @@ def upload_resume():
         'message': 'Resume uploaded and parsed successfully',
         'parsed_data': parsed_data  # use this key so frontend can read data.parsed_data
     })
+@app.route("/analytics", methods=["POST"])
+def analytics():
+    data = request.get_json()
+    scored = data.get("scored_candidates", [])
+    cutoff = float(data.get("cutoff", 0))
+
+    if not scored:
+        return jsonify({"message": "No data provided"}), 400
+
+    scores = [item["score"] for item in scored]
+    total = len(scores)
+    avg_score = sum(scores) / total if total else 0
+    highest = max(scores)
+    lowest = min(scores)
+    passed = len([s for s in scores if s >= cutoff])
+    pass_percentage = (passed / total) * 100 if total else 0
+
+    return jsonify({
+        "total_resumes": total,
+        "avg_score": round(avg_score, 2),
+        "highest_score": highest,
+        "lowest_score": lowest,
+        "pass_percentage": round(pass_percentage, 2)
+    })
 
 
 if __name__ == '__main__':

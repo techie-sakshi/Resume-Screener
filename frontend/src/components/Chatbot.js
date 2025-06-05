@@ -2,12 +2,31 @@
 // ChatBot.js
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
-
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from 'react-chartjs-2';
+ChartJS.register(
+  CategoryScale,   // ↪ “category” scale (for x‐axis labels)
+  LinearScale,     // ↪ “linear” scale (for y‐axis values)
+  BarElement,      // ↪ bar element itself
+  Title,
+  Tooltip,
+  Legend
+);
 export default function ChatBot({ parsedResumes }) {
   const [question, setQuestion] = useState("");
   const [chatLog, setChatLog] = useState([]);
   const [jobDesc, setJobDesc] = useState("");
   const [jdParsed, setJdParsed] = useState(null);
+  const [analyticsData, setAnalyticsData] = useState(null);
+
   // HR weight inputs
   const [weights, setWeights] = useState({
     skills: 50,
@@ -52,6 +71,9 @@ export default function ChatBot({ parsedResumes }) {
 
     // 2A) If we are waiting for a cutoff value...
     if (awaitingCutoff) {
+      // Send analytics fetch
+
+
       const cutoff = parseFloat(lower);
       if (isNaN(cutoff)) {
         setChatLog(prev => [
@@ -71,6 +93,16 @@ export default function ChatBot({ parsedResumes }) {
         setAwaitingCutoff(false);
         return;
       }
+      const response = await fetch("http://localhost:5000/analytics", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    scored_candidates: lastScores,
+    cutoff: cutoff
+  })
+});
+const analytics = await response.json();
+setAnalyticsData(analytics);
       // Display passed candidates, then show invitation form UI
       passed.forEach(item => {
         setChatLog(prev => [
@@ -102,7 +134,8 @@ export default function ChatBot({ parsedResumes }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           candidates: parsedResumes,
-          job_description: jdParsed
+          job_description: jdParsed,
+          weights: weights 
         })
       });
       const data = await res.json();
@@ -268,6 +301,31 @@ export default function ChatBot({ parsedResumes }) {
           </div>
         ))}
       </div>
+        {analyticsData && (
+  <div style={{ border: "1px solid #aaa", padding: 10, margin: "10px 0", background: "#eef6ff" }}>
+    <h4>📊 Analytics Dashboard</h4>
+    <p>🧮 <b>Total Resumes:</b> {analyticsData.total_resumes}</p>
+    <p>📈 <b>Average Score:</b> {analyticsData.avg_score}</p>
+    <p>🏆 <b>Highest Score:</b> {analyticsData.highest_score}, <b>Lowest Score:</b> {analyticsData.lowest_score}</p>
+    <p>✅ <b>% Above Cutoff:</b> {analyticsData.pass_percentage}%</p>
+        <Bar
+      data={{
+        labels: ['Passed', 'Failed'],
+        datasets: [{
+          label: 'Candidate Count',
+          data: [
+            Math.round(analyticsData.total_resumes * (analyticsData.pass_percentage / 100)),
+            Math.round(analyticsData.total_resumes * (1 - analyticsData.pass_percentage / 100))
+          ],
+          backgroundColor: ['#4caf50', '#f44336']
+        }]
+      }}
+      options={{ responsive: true, plugins: { legend: { display: false } } }}
+    />
+
+    {/* You can enhance this with charts below */}
+  </div>
+)}
 
       {/* 📥 Invitation form (shows only after cutoff filtering) */}
       {showInvitationForm && (
