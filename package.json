@@ -1,0 +1,21 @@
+{
+  "name": "resume-screener",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "start:frontend": "cd frontend && npm start",
+    "start:backend": "cd backend && venv\\Scripts\\activate && python app.py"
+  },
+  "dependencies": {
+    "emailjs-com": "^3.2.0"
+  }
+}
