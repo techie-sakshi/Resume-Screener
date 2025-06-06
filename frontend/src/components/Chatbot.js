@@ -346,7 +346,7 @@ export default function ChatBot({
             style={{
               alignSelf: chat.sender === 'user' ? 'flex-end' : 'flex-start',
               backgroundColor:
-                chat.sender === 'user' ? '#4a4a6a' : '#3a3a5a',
+                chat.sender === 'user' ? '	#2c47b3' : '#3a3a5a',
             }}
           >
             <b>{chat.sender === 'user' ? 'You:' : 'Bot:'} </b>
