@@ -1,38 +1,349 @@
-.App {
+/* App.css */
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 1) Color Variables / Root ──────────────────────────────────────────────────── */
+:root {
+  --bg-dark: #1a1a2e;
+  --card-bg: #1f1f38;
+  --border-color: #2e2e50;
+  --text-light: #ececec;
+  --text-muted: #a0a0b8;
+  --accent-gradient: linear-gradient(90deg, #4e54c8, #8f94fb);
+  --button-grad: linear-gradient(90deg, #5a76f0, #4e3ef0);
+  --radius: 0.5rem;
+  --gap: 1rem;
+  --font-base: 'Segoe UI', sans-serif;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 2) Global Reset & Base Styles ─────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  font-family: var(--font-base);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 3) App Container & Main Header ───────────────────────────────────────────── */
+.app-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 0 1rem;
+}
+.app-header {
+  font-size: 2.2rem;
   text-align: center;
+  margin-bottom: var(--gap);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 4) Cards Row / Card Styles ───────────────────────────────────────────────── */
+.cards-row {
+  display: flex;
+  gap: var(--gap);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Every .card uses the same dark background, border, radius, padding */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 1rem;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Each card’s title */
+.card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-light);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 5) Right Column (stacks Card 4 + Card 5) ─────────────────────────────────── */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  flex: 1; /* same width as ChatBot card in the row */
+}
+
+/* ChatBot card gets the same flex:1 as .right-column */
+.card-chatbot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  flex: 1;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 6) Card 1 – Upload Resumes Styles ──────────────────────────────────────────── */
+
+/* Hide the native file input */
+.file-input-hidden {
+  display: none;
+}
+
+/* The big drag-and-drop container */
+.upload-box {
+  background-color: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  text-align: center;
+}
+.upload-box:hover {
+  border-color: #4e54c8;
+  background-color: #25253f;
+}
+
+/* Label covers the entire upload-box area */
+.upload-label {
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Blue neon upload arrow */
+.upload-icon {
+  width: 48px;
+  height: 48px;
+  color: #4e54c8;
+}
+
+/* Main text */
+.upload-text {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Subtext under main text */
+.upload-subtext {
+  font-size: 0.85rem;
+  color: #a0a0b8;
+}
+
+/* Upload button below the box */
+.upload-btn {
+  background: var(--button-grad);
+  border: none;
+  border-radius: var(--radius);
   color: white;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: opacity 0.2s ease;
+  margin-top: var(--gap);
+}
+.upload-btn:hover {
+  opacity: 0.85;
 }
 
-.App-link {
-  color: #61dafb;
+/* Status text under upload */
+.message {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.5rem;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 7) Card 2 – Job Description Styles ───────────────────────────────────────── */
+.jobdesc-textarea {
+  width: 100%;
+  height: 250px;
+  background-color: #25253f;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 0.8rem;
+  color: var(--text-light);
+  resize: none;
+  font-size: 0.95rem;
+  scrollbar-width: thin;
+  scrollbar-color: #4e54c8 #2e2e50;
+}
+.jobdesc-textarea::-webkit-scrollbar {
+  width: 8px;
+}
+.jobdesc-textarea::-webkit-scrollbar-track {
+  background: #2e2e50;
+}
+.jobdesc-textarea::-webkit-scrollbar-thumb {
+  background-color: #4e54c8;
+  border-radius: 4px;
+  border: 2px solid #2e2e50;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 8) Card 3 – ChatBot Styles ───────────────────────────────────────────────── */
+.chatbot-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  flex: 1;
+}
+.chat-window {
+  background-color: #2e2e50;
+  border-radius: var(--radius);
+  padding: 1rem;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4e54c8 #2e2e50;
+}
+.chat-window::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-window::-webkit-scrollbar-track {
+  background: #2e2e50;
+}
+.chat-window::-webkit-scrollbar-thumb {
+  background-color: #4e54c8;
+  border-radius: 4px;
+  border: 2px solid #2e2e50;
+}
+.chat-message {
+  background-color: #3a3a5a;
+  border-radius: var(--radius);
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+.chat-input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.chat-input {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: #25253f;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+.chat-send-btn {
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.chat-send-btn svg {
+  fill: white;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 9) Card 4 – Section Weightage Styles ──────────────────────────────────────── */
+.weight-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: var(--gap);
+}
+.weight-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.weight-input label {
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+/* Transparent inputs so they don't appear white */
+.weight-number {
+  width: 60px;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background-color: transparent;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  -moz-appearance: textfield;
+}
+/* Hide spinner arrows on Chrome/Safari */
+.weight-number::-webkit-outer-spin-button,
+.weight-number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.parse-jd-btn {
+  background: var(--button-grad);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.parse-jd-btn:hover {
+  opacity: 0.85;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 10) Card 5 – Analytics Styles ─────────────────────────────────────────────── */
+.analytics-text p {
+  font-size: 0.95rem;
+  margin: 4px 0;
+  color: var(--text-light);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 11) Global Scrollbar Overrides ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background-color: #4e54c8;
+  border-radius: 4px;
+  border: 2px solid var(--bg-dark);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4e54c8 var(--bg-dark);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* 12) Placeholder if no resumes (below everything) ────────────────────────── */
+.no-resume-msg {
+  font-size: 0.95rem;
+  color: #888;
+  text-align: center;
+  margin-top: var(--gap);
+}
+/* App.css: add at the bottom or near other upload styles */
+.file-count {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
 }
