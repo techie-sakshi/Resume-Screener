@@ -347,3 +347,117 @@ body {
   color: var(--text-muted);
   text-align: center;
 }
+
+/* ───────────────────────────────────────────────────────────────────────────── */
+/* RESPONSIVE LAYOUT: Cards stack on narrower screens                         */
+/* ───────────────────────────────────────────────────────────────────────────── */
+
+/* 1) Base breakpoint: up to 1024px wide (e.g. tablets) */
+@media (max-width: 1024px) {
+  /* Stack top-level cards vertically */
+  .cards-row {
+    flex-direction: column;
+  }
+
+  /* Right column (Card 4 + Card 5) should still behave as flex column */
+  .right-column {
+    width: 100%;
+  }
+
+  /* Reduce padding inside cards */
+  .card {
+    padding: 0.75rem;
+  }
+
+  /* Slightly smaller gap between cards */
+  .app-container {
+    gap: 0.75rem;
+  }
+
+  /* Shrink the upload-box padding for medium screens */
+  .upload-box {
+    padding: 1rem;
+  }
+
+  /* Make Job Description textarea a bit shorter */
+  .jobdesc-textarea {
+    height: 140px;
+  }
+
+  /* Shrink ChatBot’s chat window font & padding */
+  .chat-window {
+    padding: 0.75rem;
+  }
+}
+
+/* 2) Smaller phones: up to 600px wide */
+@media (max-width: 600px) {
+  /* Still stack cards vertically */
+  .cards-row {
+    flex-direction: column;
+  }
+
+  /* Further reduce card padding */
+  .card {
+    padding: 0.5rem;
+  }
+
+  /* Reduce the main heading size */
+  .app-header {
+    font-size: 1.6rem;
+  }
+
+  /* Shrink upload-box to fit */
+  .upload-box {
+    padding: 0.8rem;
+  }
+  .upload-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .upload-text {
+    font-size: 0.9rem;
+  }
+  .upload-subtext {
+    font-size: 0.8rem;
+  }
+
+  /* Make the “Upload” and “Parse JD” buttons full width */
+  .upload-btn,
+  .parse-jd-btn {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Job Description textarea full-width and shorter */
+  .jobdesc-textarea {
+    height: 120px;
+    font-size: 0.9rem;
+  }
+
+  /* ChatBot chat window smaller font */
+  .chat-message {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.6rem;
+  }
+  .chat-input {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+  }
+
+  /* Section Weightage inputs shrink */
+  .weight-inputs {
+    gap: 0.5rem;
+  }
+  .weight-number {
+    width: 50px;
+    padding: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  /* Analytics text smaller */
+  .analytics-text p {
+    font-size: 0.85rem;
+  }
+}
