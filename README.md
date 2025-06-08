@@ -6,6 +6,7 @@ An AI-powered tool to help HR teams upload, screen, and shortlist candidate resu
 ---
 
 🚀 Demo
+
 Demo video link
 https://www.loom.com/share/476e8adfa5e7484fafdac7f6a683f1ea?sid=99c6bdad-b895-4e0e-961d-274729a6d4f6
 
@@ -15,9 +16,7 @@ https://www.loom.com/share/476e8adfa5e7484fafdac7f6a683f1ea?sid=99c6bdad-b895-4e
 
 📌 Problem Statement
 
-Manual resume screening is slow, inconsistent, and prone to bias. This tool addresses the Cyfuture Hackathon challenge to build an intelligent resume screening bot to automate shortlisting and interaction with candidates.
-
-
+Build a chatbot to screen resumes, shortlist top candidates, and manage initial interactions.
 ---
 
 🛠 Tech Stack
