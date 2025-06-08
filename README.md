@@ -102,22 +102,6 @@ Score distribution, skill frequency, cutoff %
 
 ---
 
-📂 Folder Structure
-
-resume-screener/
-├── frontend/        # React + Tailwind
-│   ├── components/
-│   ├── pages/
-│   └── ...
-├── backend/         # Flask + Python
-│   ├── app.py
-│   ├── model.py
-│   └── ...
-├── README.md
-
-
----
-
 🚀 Getting Started
 
 🔧 Prerequisites
