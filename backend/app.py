@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 import os
+import re
+import logging
 from resume_parser import parse_resume
 from flask_cors import CORS
 from scoring import score_candidate
@@ -11,8 +13,11 @@ from sendgrid.helpers.mail import Mail
 
 app = Flask(__name__)
 CORS(app)  # ✅ This line is required
-
-
+# Send DEBUG logs to the console
+# logging.basicConfig(level=logging.DEBUG)
+# app.logger.setLevel(logging.DEBUG)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.WARNING) 
 @app.route('/')
 def home():
     return "Flask backend is running!"
@@ -83,34 +88,57 @@ def score_endpoint():
 
     return jsonify({"scored_candidates": scored})
 
+
+#3rd
 @app.route('/parse_jd', methods=['POST'])
 def parse_jd():
-    jd_text = request.json.get('jd_text', '').lower()
+    from resume_parser import extract_skills  # Reuse matcher logic
 
-    # Very basic keyword extraction (replace with better NLP later)
-    required_skills = []
-    skills_keywords = ['python', 'java', 'aws', 'ml', 'data science', 'react', 'node']
+    jd_text = request.json.get('jd_text', '')
+    print("\n JD Parsing Started")
+    print(" Raw JD Text:\n", jd_text[:300] + "..." if len(jd_text) > 300 else jd_text)
 
-    for skill in skills_keywords:
-        if skill in jd_text:
-            required_skills.append(skill)
+    # 1️⃣ Extract skills from JD using PhraseMatcher
+    required_skills = extract_skills(jd_text)
+    print(" Extracted Skills:", required_skills)
 
-    min_education = 'b.tech' if 'b.tech' in jd_text or 'bachelor' in jd_text else None
-    min_experience_years = 0
-    import re
-    match = re.search(r'(\d+)\+?\s*years?', jd_text)
-    if match:
-        min_experience_years = int(match.group(1))
+    education_patterns = {
+    'bachelor': [r'\bbachelor', r'\bb\.?tech', r'\bbe\b', r'b\.e', r'\bundergraduate', r'\bb\.sc', r'\bbsc'],
+    'master': [r'\bmaster', r'\bm\.?tech', r'\bm\.?e\b', r'\bm\.sc', r'\bmsc', r'\bpostgraduate'],
+    'phd': [r'\bph\.?d', r'\bdoctorate']
+    }
+
+    min_education_levels = []
+
+    for level, patterns in education_patterns.items():
+        for pattern in patterns:
+            if re.search(pattern, jd_text, re.IGNORECASE):
+                min_education_levels.append(level)
+                break  # Found one match for this level, no need to check all patterns for it
+
+    print(" Minimum Education Levels Found:", min_education_levels if min_education_levels else "Not specified")
+
+
+    # 3️⃣ Extract experience in years
+    match = re.search(r'(\d+)\+?\s*years?', jd_text, flags=re.IGNORECASE)
+    min_experience_years = int(match.group(1)) if match else 0
+    print(" Minimum Experience:", f"{min_experience_years} years")
+
+    # 4️⃣ Extract certifications (optional)
+    cert_pattern = r'([A-Z][A-Za-z &]+?(?:Certificate|Certification|Certified)(?: [A-Za-z]+)*)'
+    required_certifications = re.findall(cert_pattern, jd_text)
+    print(" Required Certifications:", required_certifications if required_certifications else "None")
 
     parsed = {
         "required_skills": required_skills,
-        "min_education": min_education,
-        "min_experience_years": min_experience_years
+        "min_education": min_education_levels,
+        "min_experience_years": min_experience_years,
+        "required_certifications": required_certifications
     }
 
+    print(" Final Parsed JD:", parsed)
+
     return jsonify({"parsed_jd": parsed})
-
-
 
 @app.route("/upload-multiple", methods=["POST"])
 def upload_multiple():
@@ -138,6 +166,7 @@ def upload_multiple():
         try:
             # 2️⃣ Reuse your existing parse_resume logic on each saved file
             parsed_data = parse_resume(save_path)
+            app.logger.debug(f"Parsed resume data: {parsed_data}")
             parsed_list.append({
                 "filename": filename,
                 "parsed_data": parsed_data
@@ -202,3 +231,4 @@ def analytics():
 
 if __name__ == '__main__':
     app.run(debug=True)
+

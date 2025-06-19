@@ -1,79 +1,56 @@
+
+# scoring.py
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 def score_candidate(candidate_data, job_description, weights=None):
-    """
-    candidate_data: dict with keys like skills, education, experience, certifications
-    job_description: dict with required_skills, min_education, min_experience_years, required_certifications
-    weights: dict with keys: skills, education, experience, certifications (must sum to 100)
+    score = 0; total_w = 0
+    # weights
+    defaults = {'skills':50,'education':20,'experience':20,'certifications':10}
+    fw = (weights.copy() if weights else defaults.copy())
+    s = sum(fw.values());
+    fw = {k:v*(100/s) for k,v in fw.items()} if s!=100 else fw
 
-    Returns: float score (0-100)
-    """
-
-    score = 0
-    total_weight = 0
-
-    # Default Weights
-    default_weights = {
-        "skills": 50,
-        "education": 20,
-        "experience": 20,
-        "certifications": 10
-    }
-
-    # Use custom weights if passed, else fallback to default
-    final_weights = weights if weights else default_weights
-
-    # Normalize to ensure total is 100
-    weight_sum = sum(final_weights.values())
-    if weight_sum != 100:
-        scaling_factor = 100 / weight_sum
-        final_weights = {k: v * scaling_factor for k, v in final_weights.items()}
-
-    # Skills score
-    candidate_skills = set(s.lower() for s in candidate_data.get('skills', []))
-    required_skills = set(s.lower() for s in job_description.get('required_skills', []))
-    if required_skills:
-        skill_match_count = len(candidate_skills.intersection(required_skills))
-        skill_score = (skill_match_count / len(required_skills)) * final_weights["skills"]
+    # skills
+    cs = {s.lower() for s in candidate_data.get('skills',[])}
+    rs = {s.lower() for s in job_description.get('required_skills',[])}
+    ss = (len(cs&rs)/len(rs)*fw['skills']) if rs else 0
+    print(f"Skill matches {cs&rs}, score: {ss}")
+    score+=ss; total_w+=fw['skills']
+    cand_edu = (candidate_data.get('education') or '').lower()
+    min_edu_list = job_description.get('min_education', [])
+    if isinstance(min_edu_list, str):
+        min_edu_list = [min_edu_list.lower()]
+    elif isinstance(min_edu_list, list):
+        min_edu_list = [edu.lower() for edu in min_edu_list]
     else:
-        skill_score = 0
-    score += skill_score
-    total_weight += final_weights["skills"]
+        min_edu_list = []
 
-    # Education score
-    candidate_education = candidate_data.get('education', [])
-    required_education = job_description.get('min_education', "").lower()
-    education_score = 0
-    if required_education:
-        for edu in candidate_education:
-            if required_education in edu.lower():
-                education_score = final_weights["education"]
-                break
-    score += education_score
-    total_weight += final_weights["education"]
+    edu_match = any(req_edu in cand_edu for req_edu in min_edu_list)
+    edu_score = fw['education'] if edu_match else 0
+    logger.debug(f"EDUCATION → looking for one of {min_edu_list} in '{cand_edu}', score = {edu_score:.2f}")
 
-    # Experience score
-    candidate_exp_years = candidate_data.get('experience_years', 0)
-    required_exp_years = job_description.get('min_experience_years', 0)
-    if candidate_exp_years >= required_exp_years:
-        experience_score = final_weights["experience"]
-    else:
-        experience_score = (
-            (candidate_exp_years / required_exp_years) * final_weights["experience"]
-            if required_exp_years > 0 else 0
-        )
-    score += experience_score
-    total_weight += final_weights["experience"]
+    score += edu_score
+    total_w += fw['education']
 
-    # Certifications score
-    candidate_certs = set(c.lower() for c in candidate_data.get('certifications', []))
-    required_certs = set(c.lower() for c in job_description.get('required_certifications', []))
-    if required_certs:
-        cert_match_count = len(candidate_certs.intersection(required_certs))
-        cert_score = (cert_match_count / len(required_certs)) * final_weights["certifications"]
-    else:
-        cert_score = 0
-    score += cert_score
-    total_weight += final_weights["certifications"]
 
-    # Final score scaled to 0-100
-    final_score = (score / total_weight) * 100 if total_weight > 0 else 0
-    return round(final_score, 2)
+    # experience
+    cy = candidate_data.get('experience_years',0)
+    ry = job_description.get('min_experience_years',0)
+    if ry>0:
+        exp_s = fw['experience'] if cy>=ry else (cy/ry)*fw['experience']
+    else: exp_s=0
+    print(f"Experience years {cy}/{ry}, score: {exp_s}")
+    score+=exp_s; total_w+=fw['experience']
+
+    # certifications
+    cc = {c.lower() for c in candidate_data.get('certifications',[])}
+    rc = {c.lower() for c in job_description.get('required_certifications',[])}
+    cscr = (len(cc&rc)/len(rc)*fw['certifications']) if rc else 0
+    print(f"Cert matches {cc&rc}, score: {cscr}")
+    score+=cscr; total_w+=fw['certifications']
+
+    final = (score/total_w)*100 if total_w else 0
+    print(f"Total raw score {score}, total weight {total_w}, final scaled {final}")
+    return round(final,2)
